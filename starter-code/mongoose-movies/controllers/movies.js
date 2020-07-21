@@ -14,7 +14,8 @@ function index(req, res) {
 }
 
 function show(req, res) {
-  Movie.findById(req.params.id, function(err, movie) {
+  Movie.findById(req.params.id)
+  .populate('cast').exec(function(err, movie) {
     res.render('movies/show', { title: 'Movie Detail', movie });
   });
 }

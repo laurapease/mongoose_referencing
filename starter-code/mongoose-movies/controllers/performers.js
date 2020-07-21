@@ -1,4 +1,5 @@
 const Performer = require('../models/performer');
+const Movie = require('../models/movie');
 
 const newPerformer = (req, res) => {
   Performer.find({}, (err, performers) => {
@@ -19,7 +20,17 @@ const create = (req, res) => {
   });
 }
 
+const addToCast = (req, res) => {
+  Movie.findById(req.params.id, (err, movie) => {
+    movie.cast.push(req.body.performerId);
+    movie.save((err) => {
+      res.redirect(`/movies/${movie._id}`);
+    })
+  })
+}
+
 module.exports = {
   new: newPerformer,
-  create
+  create,
+  addToCast
 }

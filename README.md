@@ -30,8 +30,6 @@
 1. Referencing _Performers_ in the _Movie_ Model
 1. Creating _Performers_
 1. Associating Movies and Performers
-1. _AAU, when viewing a movie's detail page, I want to see a list of the current cast and add a new performer to the list_
-1. Essential Questions
 
 ---
 #### Setup
@@ -176,7 +174,6 @@
 	- Model (empty module)
 	- Router (module exporting a router object)
 	- Controller (empty module)
-	- A dedicated folder for its views
 
 - Require and mount the new router in **server.js** to the path of `/`.
 
@@ -251,23 +248,17 @@
 
 	- 1) Identify the "proper" Route (Method + Path)
 	
-	- 2) Create the UI that will send the request matching that route.
+	- 2) Define the route on the server and map it to the proper controller action (`index`, `show`, `new`, `create`, etc.).
 	
-	- 3) Define the route on the server and map it to the proper controller action (`index`, `show`, `new`, `create`, etc.).
+	- 3) Code and export the controller action.
 	
-	- 4) Code and export the controller action.
-	
-	- 5) `res.render` a view in the case of a GET request, or `res.redirect` if data was changed.
-
----
-
-<img src="https://i.imgur.com/Yi6ZiI4.png">
+	- 4) `res.render` a view in the case of a GET request, or `res.redirect` if data was changed.
 
 ---
 #### Creating _Performers_ - Step 1
 <br>
 
-- We will want a dedicated view for adding a performer, thus creating a performer will require two request/response cycles:  One for the `new` action and one for the `create` action...
+- Creating a performer will require two request/response cycles:  One for the `new` action and one for the `create` action...
 
 - **💪 YOU DO: Reply in Slack with the proper routes (Method & Path) for**:
 	- Displaying a page with a form for entering a _performer_
@@ -275,23 +266,6 @@
 
 ---
 #### Creating _Performers_ - Step 2
-<br>
-
-- We need UI that will send the request to view the form...
-
-- Let's add a new link in the nav bar in **partials/header.js**:
-
-	```html
-	<img src="/images/camera.svg">
-	<!-- new menu link below -->
-	<a href="/performers/new"
-		<%- title === 'Add Performer' ? 'class="active"' : '' %>>
-		ADD PERFORMER</a>
-	```
-	Yup, the same pattern as the other links.
-
----
-#### Creating _Performers_ - Step 3
 <br>
 
 - Clicking the **ADD PERFORMER** link is going to send a `GET /performers/new` request - now we need a route to map that HTTP request to code (controller action) in **routes/performers.js**:
@@ -309,27 +283,19 @@
 - As usual, the server won't be happy until we create and export that `new` action...
 
 ---
-#### Creating _Performers_ - Step 4
+#### Creating _Performers_ - Step 3
 <br>
 
 - We want to try to prevent the users from creating more than one document for a given performer, so we will display a list of existing performers (in a dropdown) and beg our users not to add a performer unless they've verified that the performer does not already exist in the list.
 
 - The controller action of course will need to provide an array of the exiting performers to be rendered in the dropdown...
 
----
-#### Creating _Performers_ - Step 4
-<br>
-
 - Inside of **controllers/performers.js** we go:
 
 	```js
 	const Performer = require('../models/performer');
 	
-	module.exports = {
-	  new: newPerformer
-	};
-	
-	function newPerformer(req, res) {
+	const newPerformer = (req, res) => {
 	  Performer.find({}, function(err, performers) {
 	    res.render('performers/new', {
 	      title: 'Add Performer',
@@ -337,77 +303,22 @@
 	    });
 	  })
 	}
+	
+	module.exports = {
+	  new: newPerformer
+	};
 	```
 
 ---
-#### Creating _Performers_ - Step 5
-<br>
+#### Creating _Performers_ - Step 4
 
-- We'll need that `new` view that we just rendered:
+| Route | Method |
+|:--:|:--:|
+| "/performers" | "POST" |
 
-	```sh
-	$ touch views/performers/new.ejs
-	```
+- Now for the second request/response cycle
 
-- The next slide has the markup...
-
----
-#### Creating _Performers_ - Step 5
-
--  Here's the markup for **performers/new.ejs**:
-
-	```html
-	<%- include('../partials/header') %>
-	<p>Please first ensure that the Performer is not in the dropdown
-	  <select>
-	    <% performers.forEach(function(p) { %>
-	      <option><%= p.name %></option>
-	    <% }) %>
-	  </select>
-	</p>
-	<form id="add-performer-form" action="/performers" method="POST">
-	  <label>Name:</label>
-	  <input type="text" name="name">
-	  <label>Born:</label>
-	  <input type="date" name="born">
-	  <input type="submit" value="Add Performer">
-	</form>
-	<%- include('../partials/footer') %>
-	``` 
-
----
-#### Creating _Performers_ - CSS
-
-- Find and update in **public/stylesheets/style.css**:
-
-	```css
-	#new-form *,
-	#add-review-form *,
-	#add-performer-form * {
-	  font-size: 20px;
-	  ...
-	}
-	...
-	#add-review-form,
-	#add-performer-form {
-	  display: grid;
-	  ...
-	}	
-	...
-	#add-review-form input[type="submit"],
-	#add-performer-form input[type="submit"] {
-	  width: 10rem;
-	  ...
-	}	
-	```
-
----
-#### Creating _Performers_
-<br>
-
-- Now for the second request/response cycle to handle the form submission...
-
-- The `action` & `method` on the form look good, we just need to listen to that route.
+- We need to listen to the route for creating a new performer.
 
 - **💪 YOU DO: Define the route for the create action**
 
@@ -417,12 +328,7 @@
 - In **controllers/performers.js**:
 
 	```js
-	module.exports = {
-	  new: newPerformer,
-	  create
-	};
-		
-	function create(req, res) {
+	const create = (req, res) => {
     // Hack to "fix" date formatting to prevent possible day off by 1
     // https://stackoverflow.com/questions/7556591/is-the-javascript-date-object-always-one-day-off
 	  const  s = req.body.born;
@@ -431,10 +337,13 @@
 	  Performer.create(req.body, function(err, performer) {
 	    res.redirect('/performers/new');
 	  });
-	}
+	})
+	
+	module.exports = {
+	  new: newPerformer,
+	  create
+	};
 	```
-
-- Okay, give a whirl and let's fix those typos 😊
 
 ---
 #### Associating Movies and Performers
@@ -473,17 +382,13 @@
 - Let's get started!
 
 ---
-
-<img src="https://i.imgur.com/Zg0pCYa.png">
-
----
 #### Replacing _ObjectIds_ with the Actual Docs
 <br>
 
 - Let's refactor the `moviesCtrl.show` action so that it will pass the movie with the _performer_ documents in its `cast` array instead of `ObjectIds`:
 
 	```js
-	function show(req, res) {
+	const show = (req, res) => {
 	  Movie.findById(req.params.id)
 	  .populate('cast').exec(function(err, movie) {
 	    res.render('movies/show', { title: 'Movie Detail', movie });
@@ -500,8 +405,6 @@
 - We can chain the `populate` method after any query.
 
 - When we "build" queries like this, we need to call the `exec` method to actually run it (passing in the callback to it).
-
-- **❓ How does the `populate` method know to replace the `ObjectId`s with `Performer` documents?**
 
 ---
 #### Passing the _Performers_
@@ -526,7 +429,7 @@
 
 	```js
 	
-	function show(req, res) {
+	const show = (req, res) => {
 	  Movie.findById(req.params.id)
 	  .populate('cast').exec(function(err, movie) {
 	    // Performer.find({}).where('_id').nin(movie.cast)
@@ -543,59 +446,6 @@
 	}
 	```
 	The log will show we are retrieving the _performers_ - a good sign at this point. 
-
----
-#### Refactor _show.ejs_
-<br>
-
-- The next slide has some refactored markup in **movies/show.ejs**.
-
-- It's a bit complex, so we'll review it while we make the changes.
-
-- We'll have to be careful though...
-
----
-
-```html
-  <div><%= movie.nowShowing ? 'Yes' : 'Nope' %></div>
-  <!-- start cast list -->
-  <div>Cast:</div>
-  <ul>
-    <%- movie.cast.map(p => 
-      `<li>${p.name} <small>${p.born.toLocaleDateString()}</small></li>`
-    ).join('') %>
-  </ul>
-  <!-- end cast list -->
-</section>
-	
-<!-- add to cast form below -->
-<form id="add-per-to-cast" action="/movies/<%= movie._id%>/performers" method="POST">
-  <select name="performerId">
-    <%- performers.map(p => 
-      `<option value="${p._id}">${p.name}</option>`
-    ).join('') %>
-  </select>
-  <button type="submit">Add to Cast</button>
-</form>
-```
-
----
-#### Refactor _show.ejs_ - CSS
-<br>
-
-- Add this tidbit of CSS to clean up the cast list:
-
-	```css
-	ul {
-	  margin: 0 0 1rem;
-	  padding: 0;
-	  list-style: none;
-	}
-	
-	li {
-	  font-weight: bold;
-	}
-	```
 
 ---
 #### Need a Route for the _Add to Cast_ Form Post
@@ -620,13 +470,7 @@
 	// add the Movie model
 	const Movie = require('../models/movie');
 	
-	module.exports = {
-	  new: newPerformer,
-	  create,
-	  addToCast
-	};
-	
-	function addToCast(req, res) {
+	const addToCast = (req, res) => {
 	  Movie.findById(req.params.id, function(err, movie) {
 	    movie.cast.push(req.body.performerId);
 	    movie.save(function(err) {
@@ -634,27 +478,15 @@
 	    });
 	  });
 	}
+	
+	module.exports = {
+	  new: newPerformer,
+	  create,
+	  addToCast
+	};
 	```
 
----
 #### We Did It!
-<br>
-
-- That was fun!
-
-- A few questions, then on to the lab!
-
----
-### ❓ Essential Questions
-<br>
-
-<p>Take a couple of minutes to review...</p>
-
-1. **What property type is used in schemas to reference other documents?**
-
-2. **Describe the difference between 1:M & M:M relationships.**
-
-3. **What's the name of the method used to replace an `ObjectId` with the document it references?**
 
 ---
 ## References
@@ -663,6 +495,3 @@
 - [MongooseJS Docs - Populate](https://mongoosejs.com/docs/populate.html)
 
 - [MongooseJS Docs - Queries](https://mongoosejs.com/docs/queries.html)
-
-
-

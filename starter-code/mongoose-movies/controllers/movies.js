@@ -1,4 +1,5 @@
 const Movie = require('../models/movie');
+const Performer = require('../models/performer');
 
 module.exports = {
   index,
@@ -16,7 +17,13 @@ function index(req, res) {
 function show(req, res) {
   Movie.findById(req.params.id)
   .populate('cast').exec(function(err, movie) {
-    res.render('movies/show', { title: 'Movie Detail', movie });
+    Performer.find(
+      {_id: {$nin: movie.cast}},
+      (err, performers) => {
+        console.log(performers);
+        res.render('movies/show', { title: 'Movie Detail', movie, performers });
+      }
+    )
   });
 }
 

@@ -7,7 +7,7 @@
 <br>
 
 ## Mongoose<br>Referencing Related Data
-<p>by Jim Clark</p>
+<p>adapted from the original lesson designed by Jim Clark</p>
 
 ---
 ## Learning Objectives
@@ -48,25 +48,19 @@
 
 - Use `nodemon` to start the server.
 
-- Browse to `localhost:3000`
+- Browse to `localhost:4000`
 
 ---
 #### Review the Starter Code
 <br>
 
-- Today's starter code is the final code from yesterday's _Mongoose - Embedding Related Data_ lesson with a couple of changes...
-
-- The `cast` property on the `Movie` model has been removed and all related forms/views and controller code have been adjusted accordingly. This was done so that in this lesson we can reference _performer_ documents created using a `Performer` Model.
-
-- The **movies/show.ejs** view shows how you can use EJS to calculate an _average rating_ for a movie.
+- Note: The **movies/show.ejs** view shows how you can use EJS to calculate an _average rating_ for a movie.
 
 ---
 #### Perform CRUD Using<br>Mongoose Models in a Node REPL
 <br>
 
-- Because of the removal of the `cast` property, we will want to start fresh by deleting the existing _movie_ documents.
-
-- This provides another opportunity to perform CRUD operations in Terminal using a Node REPL session - something that you'll likely need to do when developing an app.
+- Perform CRUD operations in Terminal using a Node REPL session is something that you'll likely need to do when developing an app, particularly when you make a change in your models.
 
 - Start by opening a terminal session and make sure that you are in the **mongoose-movies** folder.
 
@@ -94,6 +88,8 @@
 #### Perform CRUD Using<br>Mongoose Models in a Node REPL
 <br>
 
+- Anything that can be done with a Model in the app, can be done in the REPL including all CRUD operations.
+
 - Load the `Movie` Model:
 
 	```sh
@@ -116,13 +112,7 @@
 	The `find` method returns a **Query** object that is first logged, followed by the _movie_ docs. Press enter to return to the prompt.
 
 ---
-#### Perform CRUD Using<br>Mongoose Models in a Node REPL
-<br>
-
-- Anything that can be done with a Model in the app, can be done in the REPL including all CRUD operations.
-
----
-#### Perform CRUD Using<br>Mongoose Models in a Node REPL
+#### Additional Resource for Performing CRUD Using<br>Mongoose Models in a Node REPL
 <br>
 
 - For future reference, here's a gist that documents how to do what we just did:<br>[Perform CRUD Using Mongoose Models in a Node REPL](https://gist.github.com/jim-clark/57b646abbb6c0ce09f9fa948eab6febc)
@@ -133,7 +123,7 @@
 
 - We are going to implement the following data relationship:<br><br>**_A Movie has many Performers; A Performer has many Movies_**<br><br>**`Movie >--< Performer`** (Many-To-Many)
 
-- But unlike we saw with Reviews (One-To-Many), multiple Movies can reference the same Performer creating a Many-To-Many relationship.  Here's a simplified example...
+- But unlike Reviews (One-To-Many), multiple Movies can reference the same Performer creating a Many-To-Many relationship.  Here's a simplified example...
 
 ---
 
@@ -191,7 +181,7 @@
 #### Referencing _Performers_ in the _Movie_ Model
 <br>
 
-- With the `Performer` Model created, we can now add back the `cast` property in `Movie`:
+- With the `Performer` Model created, we can now add the `cast` property in `Movie`:
 
 	```js
 	reviews: [reviewSchema],

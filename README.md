@@ -7,6 +7,7 @@
 <br>
 
 ## Mongoose<br>Referencing Related Data
+<p>by Jim Clark</p>
 
 ---
 ## Learning Objectives
@@ -119,24 +120,6 @@
 <br>
 
 - Anything that can be done with a Model in the app, can be done in the REPL including all CRUD operations.
-
-- Next, let's remove all existing _movie_ documents...
-
----
-#### Perform CRUD Using<br>Mongoose Models in a Node REPL
-<br>
-
-- Here's a way to delete all documents from a collection:
-
-	```sh
-	> M.deleteMany({}, (err, result) => console.log(result))
-	...
-	> { n: 3, ok: 1, deletedCount: 3 }
-	```
-	
-- The _empty query object_ provided as the first argument matches all documents, so all documents were removed.
-
-- Press `control + C` twice to exit the REPL.
 
 ---
 #### Perform CRUD Using<br>Mongoose Models in a Node REPL
